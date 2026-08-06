@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/target/
+
+# Build outputs
+.next/
+out/
+frontend/.next/
+frontend/out/
+frontend/dist/
+backend/build/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.iml
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+.DS_Store

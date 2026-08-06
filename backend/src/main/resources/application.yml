@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: harvest-tracker
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/harvest_tracker}
+    username: ${SPRING_DATASOURCE_USERNAME:harvest_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:harvest_password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    org.springframework.web: INFO
+    com.harvesttracker: INFO
