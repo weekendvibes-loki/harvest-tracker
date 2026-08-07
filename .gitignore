@@ -26,3 +26,16 @@ backend/build/
 *.tmp
 *.swp
 .DS_Store
+
+# Database — never commit backups or dumps
+database/backups/*.sql
+database/backups/*.dump
+database/backups/*.gz
+
+# Docker volumes and runtime artifacts
+docker/postgres/data/
+
+# Script log output
+scripts/*.log
+
+project-commands

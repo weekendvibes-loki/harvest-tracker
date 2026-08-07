@@ -1,0 +1,29 @@
+# backend.yml — CI workflow for the Spring Boot backend
+# Placeholder: full implementation will be added in the deployment phase.
+#
+# Intended steps when implemented:
+#   1. Checkout code
+#   2. Set up JDK 21
+#   3. Cache Maven dependencies
+#   4. Run: mvn clean verify
+#   5. Upload test reports
+
+name: Backend CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+
+jobs:
+  placeholder:
+    name: Backend CI (Placeholder)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder step
+        run: echo "Backend CI workflow — implementation pending. See docs/21-deployment.md"
