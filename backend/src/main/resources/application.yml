@@ -1,27 +1,42 @@
+server:
+  shutdown: graceful
+
 spring:
   application:
     name: harvest-tracker
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/harvest_tracker}
-    username: ${SPRING_DATASOURCE_USERNAME:harvest_user}
-    password: ${SPRING_DATASOURCE_PASSWORD:harvest_password}
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  mvc:
+    favicon:
+      enabled: false
   jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: true
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
+    open-in-view: false
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: true
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+    time-zone: UTC
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
 
-logging:
-  level:
-    org.springframework.web: INFO
-    com.harvesttracker: INFO
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
