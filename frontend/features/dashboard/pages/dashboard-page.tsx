@@ -25,8 +25,9 @@ const HarvestOverviewChart = dynamic(
         title="Harvest Overview"
         description="Daily harvest quantity this week"
         isLoading
-        children={null}
-      />
+      >
+        <span className="sr-only">Loading harvest overview chart</span>
+      </ChartCard>
     ),
   },
 );
@@ -40,8 +41,9 @@ const SalesOverviewChart = dynamic(
         title="Sales Overview"
         description="Monthly revenue against target"
         isLoading
-        children={null}
-      />
+      >
+        <span className="sr-only">Loading sales overview chart</span>
+      </ChartCard>
     ),
   },
 );
