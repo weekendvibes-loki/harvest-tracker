@@ -18,4 +18,8 @@ public record PagedResponse<T>(
         boolean last = (page + 1) >= totalPages;
         return new PagedResponse<>(content, page, size, totalElements, totalPages, last);
     }
+
+    public static <T> PagedResponse<T> of(List<T> content, org.springframework.data.domain.Page<?> page) {
+        return of(content, page.getNumber(), page.getSize(), page.getTotalElements());
+    }
 }
