@@ -16,6 +16,8 @@ public interface FruitTypeRepository extends JpaRepository<FruitType, Long>, Jpa
 
     boolean existsByNameIgnoreCaseAndIdNotAndDeletedAtIsNull(String name, Long id);
 
+    Optional<FruitType> findByCodeAndDeletedAtIsNull(String code);
+
     boolean existsByCodeIgnoreCaseAndDeletedAtIsNull(String code);
 
     boolean existsByCodeIgnoreCaseAndIdNotAndDeletedAtIsNull(String code, Long id);
