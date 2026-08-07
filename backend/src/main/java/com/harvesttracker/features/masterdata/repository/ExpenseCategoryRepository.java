@@ -16,6 +16,8 @@ public interface ExpenseCategoryRepository extends JpaRepository<ExpenseCategory
 
     boolean existsByNameIgnoreCaseAndIdNotAndDeletedAtIsNull(String name, Long id);
 
+    Optional<ExpenseCategory> findByCodeIgnoreCaseAndDeletedAtIsNull(String code);
+
     boolean existsByCodeIgnoreCaseAndDeletedAtIsNull(String code);
 
     boolean existsByCodeIgnoreCaseAndIdNotAndDeletedAtIsNull(String code, Long id);
