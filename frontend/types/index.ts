@@ -1,1 +1,9 @@
-export type AppRoute = 'dashboard' | 'farms' | 'harvests' | 'workers' | 'sales' | 'reports';
+export type AppRoute =
+  | 'dashboard'
+  | 'farms'
+  | 'harvest'
+  | 'workers'
+  | 'sales'
+  | 'expenses'
+  | 'reports'
+  | 'settings';
