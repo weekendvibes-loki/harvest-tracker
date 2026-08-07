@@ -10,6 +10,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +25,48 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBadCredentialsException(
+            BadCredentialsException ex, HttpServletRequest request) {
+        log.warn("Bad credentials on request [{}]: {}", request.getRequestURI(), ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                "Invalid email or password",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(errorResponse));
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUsernameNotFoundException(
+            UsernameNotFoundException ex, HttpServletRequest request) {
+        log.warn("User not found on request [{}]: {}", request.getRequestURI(), ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                "Invalid email or password",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(errorResponse));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(
+            IllegalArgumentException ex, HttpServletRequest request) {
+        log.warn("Illegal argument on request [{}]: {}", request.getRequestURI(), ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(errorResponse));
+    }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoResourceFoundException(

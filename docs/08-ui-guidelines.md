@@ -74,6 +74,8 @@ Use Tailwind CSS and shadcn/ui components to build a professional but practical 
 
 ## Monkey Code Prompt
 
+**MANDATORY PREFIX**: Read docs/frontend/DESIGN_SYSTEM.md and follow it strictly.
+
 Objective: Create a consistent UI shell and the first set of screens for auth, dashboard, farms, and harvests.
 
 Current Project Context: The app will be used by field and office users and must remain practical and easy to use.

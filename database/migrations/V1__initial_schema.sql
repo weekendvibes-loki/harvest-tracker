@@ -54,7 +54,7 @@ $$ LANGUAGE plpgsql;
 -- Master list of all fruit types supported by the platform.
 -- Adding a new fruit requires only an INSERT here — no schema change.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.fruit_types (
+CREATE TABLE IF NOT EXISTS harvest_tracker.fruit_types (
     id              BIGSERIAL       PRIMARY KEY,
     name            VARCHAR(100)    NOT NULL,
     code            VARCHAR(20)     NOT NULL,
@@ -72,10 +72,10 @@ CREATE TABLE harvest_tracker.fruit_types (
         CHECK (season_type IN ('SUMMER', 'MONSOON', 'WINTER', 'YEAR_ROUND') OR season_type IS NULL)
 );
 
-CREATE UNIQUE INDEX uq_fruit_types_code
+CREATE UNIQUE INDEX IF NOT EXISTS uq_fruit_types_code
     ON harvest_tracker.fruit_types(code);
 
-CREATE UNIQUE INDEX uq_fruit_types_name
+CREATE UNIQUE INDEX IF NOT EXISTS uq_fruit_types_name
     ON harvest_tracker.fruit_types(name)
     WHERE deleted_at IS NULL;
 
@@ -87,7 +87,7 @@ CREATE TRIGGER trg_fruit_types_updated_at
 -- crop_variants
 -- Sub-types per fruit (Alphonso, Kesar for Mango; Cavendish for Banana).
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.crop_variants (
+CREATE TABLE IF NOT EXISTS harvest_tracker.crop_variants (
     id              BIGSERIAL       PRIMARY KEY,
     fruit_type_id   BIGINT          NOT NULL,
     name            VARCHAR(100)    NOT NULL,
@@ -105,10 +105,10 @@ CREATE TABLE harvest_tracker.crop_variants (
         ON DELETE RESTRICT
 );
 
-CREATE INDEX idx_crop_variants_fruit_type_id
+CREATE INDEX IF NOT EXISTS idx_crop_variants_fruit_type_id
     ON harvest_tracker.crop_variants(fruit_type_id);
 
-CREATE UNIQUE INDEX uq_crop_variants_fruit_code
+CREATE UNIQUE INDEX IF NOT EXISTS uq_crop_variants_fruit_code
     ON harvest_tracker.crop_variants(fruit_type_id, code)
     WHERE deleted_at IS NULL;
 
@@ -120,7 +120,7 @@ CREATE TRIGGER trg_crop_variants_updated_at
 -- units_of_measure
 -- Reference table for all measurement units: KG, TON, ACRE, HECTARE, etc.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.units_of_measure (
+CREATE TABLE IF NOT EXISTS harvest_tracker.units_of_measure (
     id              BIGSERIAL       PRIMARY KEY,
     name            VARCHAR(50)     NOT NULL,
     code            VARCHAR(10)     NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE harvest_tracker.units_of_measure (
         CHECK (measure_type IN ('WEIGHT', 'AREA', 'VOLUME', 'COUNT', 'TIME'))
 );
 
-CREATE UNIQUE INDEX uq_units_of_measure_code
+CREATE UNIQUE INDEX IF NOT EXISTS uq_units_of_measure_code
     ON harvest_tracker.units_of_measure(code);
 
 CREATE TRIGGER trg_units_of_measure_updated_at
@@ -148,7 +148,7 @@ CREATE TRIGGER trg_units_of_measure_updated_at
 -- worker_types
 -- Classifies workers: DAILY, SEASONAL, CONTRACT, SUPERVISOR.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.worker_types (
+CREATE TABLE IF NOT EXISTS harvest_tracker.worker_types (
     id              BIGSERIAL       PRIMARY KEY,
     name            VARCHAR(100)    NOT NULL,
     code            VARCHAR(20)     NOT NULL,
@@ -162,7 +162,7 @@ CREATE TABLE harvest_tracker.worker_types (
     deleted_at      TIMESTAMPTZ
 );
 
-CREATE UNIQUE INDEX uq_worker_types_code
+CREATE UNIQUE INDEX IF NOT EXISTS uq_worker_types_code
     ON harvest_tracker.worker_types(code);
 
 CREATE TRIGGER trg_worker_types_updated_at
@@ -173,7 +173,7 @@ CREATE TRIGGER trg_worker_types_updated_at
 -- payment_methods
 -- Reference: CASH, BANK_TRANSFER, UPI, CHEQUE, NEFT, RTGS.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.payment_methods (
+CREATE TABLE IF NOT EXISTS harvest_tracker.payment_methods (
     id              BIGSERIAL       PRIMARY KEY,
     name            VARCHAR(100)    NOT NULL,
     code            VARCHAR(20)     NOT NULL,
@@ -186,7 +186,7 @@ CREATE TABLE harvest_tracker.payment_methods (
     deleted_at      TIMESTAMPTZ
 );
 
-CREATE UNIQUE INDEX uq_payment_methods_code
+CREATE UNIQUE INDEX IF NOT EXISTS uq_payment_methods_code
     ON harvest_tracker.payment_methods(code);
 
 CREATE TRIGGER trg_payment_methods_updated_at
@@ -197,7 +197,7 @@ CREATE TRIGGER trg_payment_methods_updated_at
 -- expense_categories
 -- Reference: LABOUR, TRANSPORT, PACKAGING, IRRIGATION, RENT, FERTILIZER, OTHER.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.expense_categories (
+CREATE TABLE IF NOT EXISTS harvest_tracker.expense_categories (
     id              BIGSERIAL       PRIMARY KEY,
     name            VARCHAR(100)    NOT NULL,
     code            VARCHAR(20)     NOT NULL,
@@ -211,10 +211,10 @@ CREATE TABLE harvest_tracker.expense_categories (
     deleted_at      TIMESTAMPTZ
 );
 
-CREATE UNIQUE INDEX uq_expense_categories_code
+CREATE UNIQUE INDEX IF NOT EXISTS uq_expense_categories_code
     ON harvest_tracker.expense_categories(code);
 
-CREATE UNIQUE INDEX uq_expense_categories_name
+CREATE UNIQUE INDEX IF NOT EXISTS uq_expense_categories_name
     ON harvest_tracker.expense_categories(name)
     WHERE deleted_at IS NULL;
 
@@ -228,7 +228,7 @@ CREATE TRIGGER trg_expense_categories_updated_at
 -- Allows fruit-specific metadata without altering core tables.
 -- Example: fruit_type=MANGO, attribute_key='brix_level', data_type='NUMBER'
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.fruit_attributes (
+CREATE TABLE IF NOT EXISTS harvest_tracker.fruit_attributes (
     id              BIGSERIAL       PRIMARY KEY,
     fruit_type_id   BIGINT          NOT NULL,
     attribute_key   VARCHAR(100)    NOT NULL,
@@ -250,10 +250,10 @@ CREATE TABLE harvest_tracker.fruit_attributes (
         CHECK (data_type IN ('TEXT', 'NUMBER', 'DATE', 'BOOLEAN', 'SELECT'))
 );
 
-CREATE INDEX idx_fruit_attributes_fruit_type_id
+CREATE INDEX IF NOT EXISTS idx_fruit_attributes_fruit_type_id
     ON harvest_tracker.fruit_attributes(fruit_type_id);
 
-CREATE UNIQUE INDEX uq_fruit_attributes_fruit_key
+CREATE UNIQUE INDEX IF NOT EXISTS uq_fruit_attributes_fruit_key
     ON harvest_tracker.fruit_attributes(fruit_type_id, attribute_key)
     WHERE deleted_at IS NULL;
 
@@ -269,7 +269,7 @@ CREATE TRIGGER trg_fruit_attributes_updated_at
 -- roles
 -- System roles: ADMIN, FARM_OWNER, MANAGER, SUPERVISOR, ACCOUNTANT.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.roles (
+CREATE TABLE IF NOT EXISTS harvest_tracker.roles (
     id              BIGSERIAL       PRIMARY KEY,
     name            VARCHAR(100)    NOT NULL,
     code            VARCHAR(30)     NOT NULL,
@@ -283,10 +283,10 @@ CREATE TABLE harvest_tracker.roles (
     deleted_at      TIMESTAMPTZ
 );
 
-CREATE UNIQUE INDEX uq_roles_code
+CREATE UNIQUE INDEX IF NOT EXISTS uq_roles_code
     ON harvest_tracker.roles(code);
 
-CREATE UNIQUE INDEX uq_roles_name
+CREATE UNIQUE INDEX IF NOT EXISTS uq_roles_name
     ON harvest_tracker.roles(name)
     WHERE deleted_at IS NULL;
 
@@ -298,7 +298,7 @@ CREATE TRIGGER trg_roles_updated_at
 -- permissions
 -- Fine-grained capability codes: FARM_CREATE, HARVEST_VIEW, etc.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.permissions (
+CREATE TABLE IF NOT EXISTS harvest_tracker.permissions (
     id              BIGSERIAL       PRIMARY KEY,
     name            VARCHAR(150)    NOT NULL,
     code            VARCHAR(100)    NOT NULL,
@@ -316,10 +316,10 @@ CREATE TABLE harvest_tracker.permissions (
                           'INVENTORY', 'REPORT', 'ADMIN'))
 );
 
-CREATE UNIQUE INDEX uq_permissions_code
+CREATE UNIQUE INDEX IF NOT EXISTS uq_permissions_code
     ON harvest_tracker.permissions(code);
 
-CREATE INDEX idx_permissions_module
+CREATE INDEX IF NOT EXISTS idx_permissions_module
     ON harvest_tracker.permissions(module);
 
 CREATE TRIGGER trg_permissions_updated_at
@@ -330,7 +330,7 @@ CREATE TRIGGER trg_permissions_updated_at
 -- role_permissions
 -- Many-to-many junction between roles and permissions.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.role_permissions (
+CREATE TABLE IF NOT EXISTS harvest_tracker.role_permissions (
     id              BIGSERIAL       PRIMARY KEY,
     role_id         BIGINT          NOT NULL,
     permission_id   BIGINT          NOT NULL,
@@ -349,13 +349,13 @@ CREATE TABLE harvest_tracker.role_permissions (
         ON DELETE CASCADE
 );
 
-CREATE INDEX idx_role_permissions_role_id
+CREATE INDEX IF NOT EXISTS idx_role_permissions_role_id
     ON harvest_tracker.role_permissions(role_id);
 
-CREATE INDEX idx_role_permissions_permission_id
+CREATE INDEX IF NOT EXISTS idx_role_permissions_permission_id
     ON harvest_tracker.role_permissions(permission_id);
 
-CREATE UNIQUE INDEX uq_role_permissions_pair
+CREATE UNIQUE INDEX IF NOT EXISTS uq_role_permissions_pair
     ON harvest_tracker.role_permissions(role_id, permission_id)
     WHERE deleted_at IS NULL;
 
@@ -368,7 +368,7 @@ CREATE TRIGGER trg_role_permissions_updated_at
 -- System operator accounts. Separate from field workers.
 -- Password stored as BCrypt hash only. Plain text never stored.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.users (
+CREATE TABLE IF NOT EXISTS harvest_tracker.users (
     id              BIGSERIAL       PRIMARY KEY,
     role_id         BIGINT          NOT NULL,
     name            VARCHAR(200)    NOT NULL,
@@ -393,14 +393,14 @@ CREATE TABLE harvest_tracker.users (
         CHECK (TRIM(name) <> '')
 );
 
-CREATE UNIQUE INDEX uq_users_email
+CREATE UNIQUE INDEX IF NOT EXISTS uq_users_email
     ON harvest_tracker.users(email)
     WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_users_role_id
+CREATE INDEX IF NOT EXISTS idx_users_role_id
     ON harvest_tracker.users(role_id);
 
-CREATE INDEX idx_users_status
+CREATE INDEX IF NOT EXISTS idx_users_status
     ON harvest_tracker.users(status)
     WHERE deleted_at IS NULL;
 
@@ -484,7 +484,7 @@ ALTER TABLE harvest_tracker.users
 -- farms
 -- Core entity. Foundation of all downstream operations.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.farms (
+CREATE TABLE IF NOT EXISTS harvest_tracker.farms (
     id                  BIGSERIAL       PRIMARY KEY,
     owner_id            BIGINT          NOT NULL,
     land_uom_id         BIGINT,
@@ -534,18 +534,18 @@ CREATE TABLE harvest_tracker.farms (
         CHECK (gps_longitude IS NULL OR (gps_longitude BETWEEN -180 AND 180))
 );
 
-CREATE UNIQUE INDEX uq_farms_name_active
+CREATE UNIQUE INDEX IF NOT EXISTS uq_farms_name_active
     ON harvest_tracker.farms(name)
     WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_farms_owner_id
+CREATE INDEX IF NOT EXISTS idx_farms_owner_id
     ON harvest_tracker.farms(owner_id);
 
-CREATE INDEX idx_farms_status
+CREATE INDEX IF NOT EXISTS idx_farms_status
     ON harvest_tracker.farms(status)
     WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_farms_name_trgm
+CREATE INDEX IF NOT EXISTS idx_farms_name_trgm
     ON harvest_tracker.farms USING gin(name gin_trgm_ops)
     WHERE deleted_at IS NULL;
 
@@ -557,7 +557,7 @@ CREATE TRIGGER trg_farms_updated_at
 -- farm_documents
 -- Supporting documents per farm (land title, lease contract, certificates).
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.farm_documents (
+CREATE TABLE IF NOT EXISTS harvest_tracker.farm_documents (
     id              BIGSERIAL       PRIMARY KEY,
     farm_id         BIGINT          NOT NULL,
     document_name   VARCHAR(255)    NOT NULL,
@@ -587,7 +587,7 @@ CREATE TABLE harvest_tracker.farm_documents (
                                  'GOVERNMENT_ID', 'INSURANCE', 'OTHER'))
 );
 
-CREATE INDEX idx_farm_documents_farm_id
+CREATE INDEX IF NOT EXISTS idx_farm_documents_farm_id
     ON harvest_tracker.farm_documents(farm_id);
 
 CREATE TRIGGER trg_farm_documents_updated_at
@@ -599,7 +599,7 @@ CREATE TRIGGER trg_farm_documents_updated_at
 -- Junction: a farm can cultivate multiple fruit types.
 -- Enables multi-fruit farms without schema changes.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.farm_fruit_types (
+CREATE TABLE IF NOT EXISTS harvest_tracker.farm_fruit_types (
     id                  BIGSERIAL       PRIMARY KEY,
     farm_id             BIGINT          NOT NULL,
     fruit_type_id       BIGINT          NOT NULL,
@@ -626,13 +626,13 @@ CREATE TABLE harvest_tracker.farm_fruit_types (
         ON DELETE SET NULL
 );
 
-CREATE INDEX idx_farm_fruit_types_farm_id
+CREATE INDEX IF NOT EXISTS idx_farm_fruit_types_farm_id
     ON harvest_tracker.farm_fruit_types(farm_id);
 
-CREATE INDEX idx_farm_fruit_types_fruit_type_id
+CREATE INDEX IF NOT EXISTS idx_farm_fruit_types_fruit_type_id
     ON harvest_tracker.farm_fruit_types(fruit_type_id);
 
-CREATE UNIQUE INDEX uq_farm_fruit_types_pair
+CREATE UNIQUE INDEX IF NOT EXISTS uq_farm_fruit_types_pair
     ON harvest_tracker.farm_fruit_types(farm_id, fruit_type_id)
     WHERE deleted_at IS NULL;
 
@@ -645,7 +645,7 @@ CREATE TRIGGER trg_farm_fruit_types_updated_at
 -- Named harvest time windows per farm and fruit type.
 -- Example: Mango Season 2024 (Alphonso Farm A, Jan–May 2024)
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.seasons (
+CREATE TABLE IF NOT EXISTS harvest_tracker.seasons (
     id              BIGSERIAL       PRIMARY KEY,
     farm_id         BIGINT          NOT NULL,
     fruit_type_id   BIGINT          NOT NULL,
@@ -682,16 +682,16 @@ CREATE TABLE harvest_tracker.seasons (
         CHECK (end_date > start_date)
 );
 
-CREATE INDEX idx_seasons_farm_id
+CREATE INDEX IF NOT EXISTS idx_seasons_farm_id
     ON harvest_tracker.seasons(farm_id);
 
-CREATE INDEX idx_seasons_fruit_type_id
+CREATE INDEX IF NOT EXISTS idx_seasons_fruit_type_id
     ON harvest_tracker.seasons(fruit_type_id);
 
-CREATE INDEX idx_seasons_farm_fruit_year
+CREATE INDEX IF NOT EXISTS idx_seasons_farm_fruit_year
     ON harvest_tracker.seasons(farm_id, fruit_type_id, year);
 
-CREATE UNIQUE INDEX uq_seasons_farm_fruit_year_name
+CREATE UNIQUE INDEX IF NOT EXISTS uq_seasons_farm_fruit_year_name
     ON harvest_tracker.seasons(farm_id, fruit_type_id, year, name)
     WHERE deleted_at IS NULL;
 
@@ -710,7 +710,7 @@ CREATE TRIGGER trg_seasons_updated_at
 -- Business rule: harvest_date <= CURRENT_DATE
 -- Business rule: must have at least one worker (enforced by application layer)
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.harvest_records (
+CREATE TABLE IF NOT EXISTS harvest_tracker.harvest_records (
     id                  BIGSERIAL       PRIMARY KEY,
     farm_id             BIGINT          NOT NULL,
     season_id           BIGINT          NOT NULL,
@@ -765,28 +765,28 @@ CREATE TABLE harvest_tracker.harvest_records (
         CHECK (status IN ('DRAFT', 'CONFIRMED', 'STORED', 'SOLD'))
 );
 
-CREATE INDEX idx_harvest_records_farm_id
+CREATE INDEX IF NOT EXISTS idx_harvest_records_farm_id
     ON harvest_tracker.harvest_records(farm_id);
 
-CREATE INDEX idx_harvest_records_season_id
+CREATE INDEX IF NOT EXISTS idx_harvest_records_season_id
     ON harvest_tracker.harvest_records(season_id);
 
-CREATE INDEX idx_harvest_records_fruit_type_id
+CREATE INDEX IF NOT EXISTS idx_harvest_records_fruit_type_id
     ON harvest_tracker.harvest_records(fruit_type_id);
 
-CREATE INDEX idx_harvest_records_crop_variant_id
+CREATE INDEX IF NOT EXISTS idx_harvest_records_crop_variant_id
     ON harvest_tracker.harvest_records(crop_variant_id);
 
-CREATE INDEX idx_harvest_records_supervisor_id
+CREATE INDEX IF NOT EXISTS idx_harvest_records_supervisor_id
     ON harvest_tracker.harvest_records(supervisor_id);
 
-CREATE INDEX idx_harvest_records_farm_season
+CREATE INDEX IF NOT EXISTS idx_harvest_records_farm_season
     ON harvest_tracker.harvest_records(farm_id, season_id);
 
-CREATE INDEX idx_harvest_records_farm_date
+CREATE INDEX IF NOT EXISTS idx_harvest_records_farm_date
     ON harvest_tracker.harvest_records(farm_id, harvest_date);
 
-CREATE INDEX idx_harvest_records_harvest_date
+CREATE INDEX IF NOT EXISTS idx_harvest_records_harvest_date
     ON harvest_tracker.harvest_records(harvest_date)
     WHERE deleted_at IS NULL;
 
@@ -799,7 +799,7 @@ CREATE TRIGGER trg_harvest_records_updated_at
 -- Quality inspection records per harvest batch.
 -- Multiple checks can be recorded for one harvest.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.harvest_quality_checks (
+CREATE TABLE IF NOT EXISTS harvest_tracker.harvest_quality_checks (
     id                  BIGSERIAL       PRIMARY KEY,
     harvest_record_id   BIGINT          NOT NULL,
     checked_by          BIGINT,
@@ -836,7 +836,7 @@ CREATE TABLE harvest_tracker.harvest_quality_checks (
         CHECK (average_weight_grams IS NULL OR average_weight_grams > 0)
 );
 
-CREATE INDEX idx_harvest_quality_checks_harvest_record_id
+CREATE INDEX IF NOT EXISTS idx_harvest_quality_checks_harvest_record_id
     ON harvest_tracker.harvest_quality_checks(harvest_record_id);
 
 CREATE TRIGGER trg_harvest_quality_checks_updated_at
@@ -848,7 +848,7 @@ CREATE TRIGGER trg_harvest_quality_checks_updated_at
 -- Many-to-many junction: which workers participated in each harvest.
 -- Business rule: one worker cannot appear twice in the same harvest.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.harvest_workers (
+CREATE TABLE IF NOT EXISTS harvest_tracker.harvest_workers (
     id                  BIGSERIAL       PRIMARY KEY,
     harvest_record_id   BIGINT          NOT NULL,
     worker_id           BIGINT          NOT NULL,
@@ -874,14 +874,14 @@ CREATE TABLE harvest_tracker.harvest_workers (
         CHECK (hours_worked IS NULL OR (hours_worked BETWEEN 0 AND 24))
 );
 
-CREATE INDEX idx_harvest_workers_harvest_record_id
+CREATE INDEX IF NOT EXISTS idx_harvest_workers_harvest_record_id
     ON harvest_tracker.harvest_workers(harvest_record_id);
 
-CREATE INDEX idx_harvest_workers_worker_id
+CREATE INDEX IF NOT EXISTS idx_harvest_workers_worker_id
     ON harvest_tracker.harvest_workers(worker_id);
 
 -- Worker cannot appear twice in same harvest (prevents double-counting)
-CREATE UNIQUE INDEX uq_harvest_workers_harvest_worker
+CREATE UNIQUE INDEX IF NOT EXISTS uq_harvest_workers_harvest_worker
     ON harvest_tracker.harvest_workers(harvest_record_id, worker_id)
     WHERE deleted_at IS NULL;
 
@@ -898,7 +898,7 @@ CREATE TRIGGER trg_harvest_workers_updated_at
 -- Field labourers. Separate from system users.
 -- A worker may not have a system login account.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.workers (
+CREATE TABLE IF NOT EXISTS harvest_tracker.workers (
     id              BIGSERIAL       PRIMARY KEY,
     farm_id         BIGINT          NOT NULL,
     worker_type_id  BIGINT,
@@ -947,21 +947,21 @@ ALTER TABLE harvest_tracker.harvest_workers
         FOREIGN KEY (worker_id) REFERENCES harvest_tracker.workers(id)
         ON DELETE RESTRICT;
 
-CREATE INDEX idx_workers_farm_id
+CREATE INDEX IF NOT EXISTS idx_workers_farm_id
     ON harvest_tracker.workers(farm_id);
 
-CREATE INDEX idx_workers_worker_type_id
+CREATE INDEX IF NOT EXISTS idx_workers_worker_type_id
     ON harvest_tracker.workers(worker_type_id);
 
-CREATE UNIQUE INDEX uq_workers_phone_active
+CREATE UNIQUE INDEX IF NOT EXISTS uq_workers_phone_active
     ON harvest_tracker.workers(phone)
     WHERE deleted_at IS NULL AND phone IS NOT NULL;
 
-CREATE INDEX idx_workers_active_farm
+CREATE INDEX IF NOT EXISTS idx_workers_active_farm
     ON harvest_tracker.workers(farm_id)
     WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_workers_name_trgm
+CREATE INDEX IF NOT EXISTS idx_workers_name_trgm
     ON harvest_tracker.workers USING gin(name gin_trgm_ops)
     WHERE deleted_at IS NULL;
 
@@ -974,7 +974,7 @@ CREATE TRIGGER trg_workers_updated_at
 -- Daily attendance records per worker.
 -- Business rule: one record per worker per date.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.worker_attendance (
+CREATE TABLE IF NOT EXISTS harvest_tracker.worker_attendance (
     id                  BIGSERIAL       PRIMARY KEY,
     worker_id           BIGINT          NOT NULL,
     harvest_record_id   BIGINT,
@@ -1005,21 +1005,21 @@ CREATE TABLE harvest_tracker.worker_attendance (
         CHECK (hours_worked IS NULL OR (hours_worked BETWEEN 0 AND 24))
 );
 
-CREATE INDEX idx_worker_attendance_worker_id
+CREATE INDEX IF NOT EXISTS idx_worker_attendance_worker_id
     ON harvest_tracker.worker_attendance(worker_id);
 
-CREATE INDEX idx_worker_attendance_harvest_record_id
+CREATE INDEX IF NOT EXISTS idx_worker_attendance_harvest_record_id
     ON harvest_tracker.worker_attendance(harvest_record_id);
 
-CREATE INDEX idx_worker_attendance_worker_date
+CREATE INDEX IF NOT EXISTS idx_worker_attendance_worker_date
     ON harvest_tracker.worker_attendance(worker_id, attendance_date);
 
-CREATE INDEX idx_worker_attendance_date
+CREATE INDEX IF NOT EXISTS idx_worker_attendance_date
     ON harvest_tracker.worker_attendance(attendance_date)
     WHERE deleted_at IS NULL;
 
 -- One attendance record per worker per date
-CREATE UNIQUE INDEX uq_worker_attendance_worker_date
+CREATE UNIQUE INDEX IF NOT EXISTS uq_worker_attendance_worker_date
     ON harvest_tracker.worker_attendance(worker_id, attendance_date)
     WHERE deleted_at IS NULL;
 
@@ -1031,7 +1031,7 @@ CREATE TRIGGER trg_worker_attendance_updated_at
 -- worker_payments
 -- Payroll settlement records per worker per period.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.worker_payments (
+CREATE TABLE IF NOT EXISTS harvest_tracker.worker_payments (
     id                  BIGSERIAL       PRIMARY KEY,
     worker_id           BIGINT          NOT NULL,
     payment_method_id   BIGINT,
@@ -1074,16 +1074,16 @@ CREATE TABLE harvest_tracker.worker_payments (
         CHECK (total_days_worked >= 0)
 );
 
-CREATE INDEX idx_worker_payments_worker_id
+CREATE INDEX IF NOT EXISTS idx_worker_payments_worker_id
     ON harvest_tracker.worker_payments(worker_id);
 
-CREATE INDEX idx_worker_payments_payment_method_id
+CREATE INDEX IF NOT EXISTS idx_worker_payments_payment_method_id
     ON harvest_tracker.worker_payments(payment_method_id);
 
-CREATE INDEX idx_worker_payments_worker_period
+CREATE INDEX IF NOT EXISTS idx_worker_payments_worker_period
     ON harvest_tracker.worker_payments(worker_id, period_start, period_end);
 
-CREATE INDEX idx_worker_payments_pending
+CREATE INDEX IF NOT EXISTS idx_worker_payments_pending
     ON harvest_tracker.worker_payments(worker_id)
     WHERE payment_status = 'PENDING' AND deleted_at IS NULL;
 
@@ -1099,7 +1099,7 @@ CREATE TRIGGER trg_worker_payments_updated_at
 -- customers
 -- Buyer profiles. Separate from system users.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.customers (
+CREATE TABLE IF NOT EXISTS harvest_tracker.customers (
     id              BIGSERIAL       PRIMARY KEY,
     name            VARCHAR(200)    NOT NULL,
     phone           VARCHAR(20),
@@ -1129,15 +1129,15 @@ CREATE TABLE harvest_tracker.customers (
         CHECK (TRIM(name) <> '')
 );
 
-CREATE UNIQUE INDEX uq_customers_phone_active
+CREATE UNIQUE INDEX IF NOT EXISTS uq_customers_phone_active
     ON harvest_tracker.customers(phone)
     WHERE deleted_at IS NULL AND phone IS NOT NULL;
 
-CREATE INDEX idx_customers_status
+CREATE INDEX IF NOT EXISTS idx_customers_status
     ON harvest_tracker.customers(status)
     WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_customers_name_trgm
+CREATE INDEX IF NOT EXISTS idx_customers_name_trgm
     ON harvest_tracker.customers USING gin(name gin_trgm_ops)
     WHERE deleted_at IS NULL;
 
@@ -1150,7 +1150,7 @@ CREATE TRIGGER trg_customers_updated_at
 -- Sales order header. State machine: DRAFT → CONFIRMED → DISPATCHED →
 --   DELIVERED → INVOICED → PAID → CANCELLED
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.orders (
+CREATE TABLE IF NOT EXISTS harvest_tracker.orders (
     id              BIGSERIAL       PRIMARY KEY,
     customer_id     BIGINT          NOT NULL,
     order_date      DATE            NOT NULL DEFAULT CURRENT_DATE,
@@ -1182,17 +1182,17 @@ CREATE TABLE harvest_tracker.orders (
         CHECK (order_date <= CURRENT_DATE)
 );
 
-CREATE INDEX idx_orders_customer_id
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id
     ON harvest_tracker.orders(customer_id);
 
-CREATE INDEX idx_orders_order_date
+CREATE INDEX IF NOT EXISTS idx_orders_order_date
     ON harvest_tracker.orders(order_date)
     WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_orders_customer_status
+CREATE INDEX IF NOT EXISTS idx_orders_customer_status
     ON harvest_tracker.orders(customer_id, order_status);
 
-CREATE INDEX idx_orders_active_status
+CREATE INDEX IF NOT EXISTS idx_orders_active_status
     ON harvest_tracker.orders(order_status)
     WHERE deleted_at IS NULL;
 
@@ -1204,7 +1204,7 @@ CREATE TRIGGER trg_orders_updated_at
 -- order_items
 -- Line items within a sales order. Each item references a harvest batch.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.order_items (
+CREATE TABLE IF NOT EXISTS harvest_tracker.order_items (
     id                  BIGSERIAL       PRIMARY KEY,
     order_id            BIGINT          NOT NULL,
     harvest_record_id   BIGINT,
@@ -1251,13 +1251,13 @@ CREATE TABLE harvest_tracker.order_items (
         CHECK (line_total >= 0)
 );
 
-CREATE INDEX idx_order_items_order_id
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id
     ON harvest_tracker.order_items(order_id);
 
-CREATE INDEX idx_order_items_harvest_record_id
+CREATE INDEX IF NOT EXISTS idx_order_items_harvest_record_id
     ON harvest_tracker.order_items(harvest_record_id);
 
-CREATE INDEX idx_order_items_fruit_type_id
+CREATE INDEX IF NOT EXISTS idx_order_items_fruit_type_id
     ON harvest_tracker.order_items(fruit_type_id);
 
 CREATE TRIGGER trg_order_items_updated_at
@@ -1268,7 +1268,7 @@ CREATE TRIGGER trg_order_items_updated_at
 -- sales
 -- Actual sale event confirming dispatch/delivery from a farm.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.sales (
+CREATE TABLE IF NOT EXISTS harvest_tracker.sales (
     id                      BIGSERIAL       PRIMARY KEY,
     order_id                BIGINT          NOT NULL,
     farm_id                 BIGINT          NOT NULL,
@@ -1308,13 +1308,13 @@ CREATE TABLE harvest_tracker.sales (
         CHECK (total_sale_amount >= 0)
 );
 
-CREATE INDEX idx_sales_order_id
+CREATE INDEX IF NOT EXISTS idx_sales_order_id
     ON harvest_tracker.sales(order_id);
 
-CREATE INDEX idx_sales_farm_id
+CREATE INDEX IF NOT EXISTS idx_sales_farm_id
     ON harvest_tracker.sales(farm_id);
 
-CREATE INDEX idx_sales_sale_date
+CREATE INDEX IF NOT EXISTS idx_sales_sale_date
     ON harvest_tracker.sales(sale_date)
     WHERE deleted_at IS NULL;
 
@@ -1326,7 +1326,7 @@ CREATE TRIGGER trg_sales_updated_at
 -- transport_records
 -- Logistics details per order (vehicle, driver, transport cost).
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.transport_records (
+CREATE TABLE IF NOT EXISTS harvest_tracker.transport_records (
     id                  BIGSERIAL       PRIMARY KEY,
     order_id            BIGINT          NOT NULL,
     vehicle_number      VARCHAR(20),
@@ -1362,7 +1362,7 @@ CREATE TABLE harvest_tracker.transport_records (
         CHECK (delivery_date IS NULL OR dispatch_date IS NULL OR delivery_date >= dispatch_date)
 );
 
-CREATE INDEX idx_transport_records_order_id
+CREATE INDEX IF NOT EXISTS idx_transport_records_order_id
     ON harvest_tracker.transport_records(order_id);
 
 CREATE TRIGGER trg_transport_records_updated_at
@@ -1374,7 +1374,7 @@ CREATE TRIGGER trg_transport_records_updated_at
 -- One invoice per order. 1:1 relationship enforced by unique constraint.
 -- paid_amount is updated incrementally as payments are added.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.invoices (
+CREATE TABLE IF NOT EXISTS harvest_tracker.invoices (
     id              BIGSERIAL       PRIMARY KEY,
     order_id        BIGINT          NOT NULL,
     customer_id     BIGINT          NOT NULL,
@@ -1418,25 +1418,25 @@ CREATE TABLE harvest_tracker.invoices (
 );
 
 -- 1:1 relationship: one invoice per order
-CREATE UNIQUE INDEX uq_invoices_order_id
+CREATE UNIQUE INDEX IF NOT EXISTS uq_invoices_order_id
     ON harvest_tracker.invoices(order_id)
     WHERE deleted_at IS NULL;
 
-CREATE UNIQUE INDEX uq_invoices_invoice_number
+CREATE UNIQUE INDEX IF NOT EXISTS uq_invoices_invoice_number
     ON harvest_tracker.invoices(invoice_number)
     WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_invoices_order_id
+CREATE INDEX IF NOT EXISTS idx_invoices_order_id
     ON harvest_tracker.invoices(order_id);
 
-CREATE INDEX idx_invoices_customer_id
+CREATE INDEX IF NOT EXISTS idx_invoices_customer_id
     ON harvest_tracker.invoices(customer_id);
 
-CREATE INDEX idx_invoices_customer_status
+CREATE INDEX IF NOT EXISTS idx_invoices_customer_status
     ON harvest_tracker.invoices(customer_id, invoice_status);
 
 -- Open invoices for dashboard
-CREATE INDEX idx_invoices_open
+CREATE INDEX IF NOT EXISTS idx_invoices_open
     ON harvest_tracker.invoices(invoice_status, due_date)
     WHERE deleted_at IS NULL AND invoice_status NOT IN ('PAID', 'CANCELLED');
 
@@ -1449,7 +1449,7 @@ CREATE TRIGGER trg_invoices_updated_at
 -- Individual payment transactions against an invoice.
 -- Multiple payments per invoice are allowed (partial payment support).
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.payments (
+CREATE TABLE IF NOT EXISTS harvest_tracker.payments (
     id                  BIGSERIAL       PRIMARY KEY,
     invoice_id          BIGINT          NOT NULL,
     payment_method_id   BIGINT,
@@ -1483,16 +1483,16 @@ CREATE TABLE harvest_tracker.payments (
         CHECK (amount > 0)
 );
 
-CREATE INDEX idx_payments_invoice_id
+CREATE INDEX IF NOT EXISTS idx_payments_invoice_id
     ON harvest_tracker.payments(invoice_id);
 
-CREATE INDEX idx_payments_payment_method_id
+CREATE INDEX IF NOT EXISTS idx_payments_payment_method_id
     ON harvest_tracker.payments(payment_method_id);
 
-CREATE INDEX idx_payments_invoice_status
+CREATE INDEX IF NOT EXISTS idx_payments_invoice_status
     ON harvest_tracker.payments(invoice_id, payment_status);
 
-CREATE INDEX idx_payments_payment_date
+CREATE INDEX IF NOT EXISTS idx_payments_payment_date
     ON harvest_tracker.payments(payment_date)
     WHERE deleted_at IS NULL;
 
@@ -1510,7 +1510,7 @@ CREATE TRIGGER trg_payments_updated_at
 -- General farm expenses: land rent, irrigation.
 -- Harvest-specific: packaging, cold storage.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.expenses (
+CREATE TABLE IF NOT EXISTS harvest_tracker.expenses (
     id                      BIGSERIAL       PRIMARY KEY,
     farm_id                 BIGINT          NOT NULL,
     harvest_record_id       BIGINT,
@@ -1554,22 +1554,22 @@ CREATE TABLE harvest_tracker.expenses (
         CHECK (status IN ('RECORDED', 'APPROVED', 'REJECTED'))
 );
 
-CREATE INDEX idx_expenses_farm_id
+CREATE INDEX IF NOT EXISTS idx_expenses_farm_id
     ON harvest_tracker.expenses(farm_id);
 
-CREATE INDEX idx_expenses_harvest_record_id
+CREATE INDEX IF NOT EXISTS idx_expenses_harvest_record_id
     ON harvest_tracker.expenses(harvest_record_id);
 
-CREATE INDEX idx_expenses_expense_category_id
+CREATE INDEX IF NOT EXISTS idx_expenses_expense_category_id
     ON harvest_tracker.expenses(expense_category_id);
 
-CREATE INDEX idx_expenses_payment_method_id
+CREATE INDEX IF NOT EXISTS idx_expenses_payment_method_id
     ON harvest_tracker.expenses(payment_method_id);
 
-CREATE INDEX idx_expenses_farm_date
+CREATE INDEX IF NOT EXISTS idx_expenses_farm_date
     ON harvest_tracker.expenses(farm_id, expense_date);
 
-CREATE INDEX idx_expenses_expense_date
+CREATE INDEX IF NOT EXISTS idx_expenses_expense_date
     ON harvest_tracker.expenses(expense_date)
     WHERE deleted_at IS NULL;
 
@@ -1586,7 +1586,7 @@ CREATE TRIGGER trg_expenses_updated_at
 -- Tracks available fruit quantity from harvest through sale.
 -- available_quantity decreases as order_items reference this batch.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.inventory_batches (
+CREATE TABLE IF NOT EXISTS harvest_tracker.inventory_batches (
     id                  BIGSERIAL       PRIMARY KEY,
     harvest_record_id   BIGINT          NOT NULL,
     farm_id             BIGINT          NOT NULL,
@@ -1633,16 +1633,16 @@ CREATE TABLE harvest_tracker.inventory_batches (
         CHECK (status IN ('IN_STOCK', 'PARTIAL', 'DEPLETED', 'EXPIRED'))
 );
 
-CREATE INDEX idx_inventory_batches_harvest_record_id
+CREATE INDEX IF NOT EXISTS idx_inventory_batches_harvest_record_id
     ON harvest_tracker.inventory_batches(harvest_record_id);
 
-CREATE INDEX idx_inventory_batches_farm_id
+CREATE INDEX IF NOT EXISTS idx_inventory_batches_farm_id
     ON harvest_tracker.inventory_batches(farm_id);
 
-CREATE INDEX idx_inventory_batches_fruit_type_id
+CREATE INDEX IF NOT EXISTS idx_inventory_batches_fruit_type_id
     ON harvest_tracker.inventory_batches(fruit_type_id);
 
-CREATE INDEX idx_inventory_batches_status
+CREATE INDEX IF NOT EXISTS idx_inventory_batches_status
     ON harvest_tracker.inventory_batches(status)
     WHERE deleted_at IS NULL;
 
@@ -1660,7 +1660,7 @@ CREATE TRIGGER trg_inventory_batches_updated_at
 -- Used for: historical seasonal summaries, exported reports, closed-period data.
 -- Live dashboard queries run directly against transactional tables.
 -- -----------------------------------------------------------------------------
-CREATE TABLE harvest_tracker.report_snapshots (
+CREATE TABLE IF NOT EXISTS harvest_tracker.report_snapshots (
     id              BIGSERIAL       PRIMARY KEY,
     farm_id         BIGINT,
     season_id       BIGINT,
@@ -1699,13 +1699,13 @@ CREATE TABLE harvest_tracker.report_snapshots (
         CHECK (period_end >= period_start)
 );
 
-CREATE INDEX idx_report_snapshots_farm_id
+CREATE INDEX IF NOT EXISTS idx_report_snapshots_farm_id
     ON harvest_tracker.report_snapshots(farm_id);
 
-CREATE INDEX idx_report_snapshots_season_id
+CREATE INDEX IF NOT EXISTS idx_report_snapshots_season_id
     ON harvest_tracker.report_snapshots(season_id);
 
-CREATE INDEX idx_report_snapshots_type_period
+CREATE INDEX IF NOT EXISTS idx_report_snapshots_type_period
     ON harvest_tracker.report_snapshots(report_type, report_period);
 
 CREATE TRIGGER trg_report_snapshots_updated_at

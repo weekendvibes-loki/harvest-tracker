@@ -13,6 +13,13 @@ spring:
       enabled: false
   jpa:
     open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: harvest_tracker
+    baseline-on-migrate: true
+    baseline-version: 0
+    repair-on-migrate: true
   jackson:
     serialization:
       write-dates-as-timestamps: false

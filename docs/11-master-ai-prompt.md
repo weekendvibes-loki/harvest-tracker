@@ -60,6 +60,8 @@ Use this prompt as the default starting point for any implementation task. Repla
 
 ## Monkey Code Prompt
 
+**MANDATORY PREFIX**: Read docs/frontend/DESIGN_SYSTEM.md and follow it strictly.
+
 Objective: Execute the next implementation phase for Harvest Tracker using the existing documentation set.
 
 Current Project Context: The project is in early development and should be built in phased milestones. The system must support mango farms now and later support other fruits.
